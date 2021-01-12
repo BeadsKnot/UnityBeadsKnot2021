@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ShortLine : MonoBehaviour
 {
-    public Bead bd0, bd1;
+    public GameObject bd0, bd1;
     public Vector3 vec0, vec1;
     // Start is called before the first frame update
     void Start()
