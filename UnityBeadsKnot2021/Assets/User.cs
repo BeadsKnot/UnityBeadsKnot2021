@@ -8,6 +8,7 @@ public class User : MonoBehaviour
     public Vector3 previousPosition;
     public GameObject currentObject;
     public List<Vector3> trace;
+    GameObject ShortCurve;
 
     public float ScreenHeight, ScreenWidth;
     // Start is called before the first frame update
@@ -16,6 +17,7 @@ public class User : MonoBehaviour
         ScreenHeight = 2.5f;
         ScreenWidth = Screen.width * 2.5f / Screen.height;
         trace = new List<Vector3>();
+        ShortCurve = null;
     }
 
     // Update is called once per frame
@@ -26,6 +28,8 @@ public class User : MonoBehaviour
         {
             trace.Clear();
             previousPosition = mouse;
+            GameObject prefab = Resources.Load("Prefabs/ShortCurve") as GameObject;
+            ShortCurve = Instantiate(prefab,Vector3.zero,Quaternion.identity, currentObject.transform) as GameObject;
         }
         else if (Input.GetMouseButton(0))
 		{
@@ -51,15 +55,20 @@ public class User : MonoBehaviour
             Vector3 vec = trace[pos];
             vec.z = -0.1f;
             GameObject prefab = Resources.Load("Prefabs/Bead") as GameObject;
-            bead[pos] = Instantiate<GameObject>(prefab, vec, Quaternion.identity, currentObject.transform);
+            bead[pos] = Instantiate<GameObject>(prefab, vec, Quaternion.identity, ShortCurve.transform);
 		}
         for (int pos = 0; pos < size-1; pos++)
         {
             GameObject prefab = Resources.Load("Prefabs/ShortLine") as GameObject;
-            shortLine[pos] = Instantiate<GameObject>(prefab, Vector3.zero, Quaternion.identity, currentObject.transform);
+            shortLine[pos] = Instantiate<GameObject>(prefab, Vector3.zero, Quaternion.identity, ShortCurve.transform);
             ShortLine sl = shortLine[pos].GetComponent<ShortLine>();
             sl.bd0 = bead[pos];
             sl.bd1 = bead[pos+1];
+
+            bead[pos].GetComponent<Bead>().SetNorth(bead[pos + 1]);
+            bead[pos + 1].GetComponent<Bead>().SetSouth(bead[pos]);
         }
+        bead[0].GetComponent<Bead>().isNode = bead[0].GetComponent<Bead>().isEnd = true;
+        bead[size - 1].GetComponent<Bead>().isNode = bead[size - 1].GetComponent<Bead>().isEnd = true;
     }
 }
