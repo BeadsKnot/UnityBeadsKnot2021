@@ -47,6 +47,7 @@ public class User : MonoBehaviour
 
     void AddEdge(List<Vector3> trace)
 	{
+        Debug.Log("AddEdge");
         int size = trace.Count;
         GameObject[] bead = new GameObject[size];
         GameObject[] shortLine = new GameObject[size - 1];
@@ -75,50 +76,40 @@ public class User : MonoBehaviour
         DetectCrossingAfterAddEdge(ShortCurve);
     }
 
+    public class PairBead
+	{
+        public Bead first, second;
+        public PairBead(Bead a, Bead b)
+		{
+            first = a;second = b;
+		}
+ 
+    }
+
     void DetectCrossingAfterAddEdge(GameObject ShortCurve)
 	{
-        ShortLine[] SCurve = ShortCurve.GetComponentsInChildren<ShortLine>();
-        ShortLine[] AllShortLine = FindObjectsOfType<ShortLine>();
-        int nLength = SCurve.Length;
-        int mLength = AllShortLine.Length;
+        List<PairBead> pairs = new List<PairBead>();
+        Debug.Log("DetectCrossingAfterAddEdge"); 
+        Bead[] SBeads = ShortCurve.GetComponentsInChildren<Bead>();
+        Bead[] AllBeads = FindObjectsOfType<Bead>();
+        int nLength = SBeads.Length;
+        int mLength = AllBeads.Length;
         for(int n=0; n<nLength; n++)
 		{
-            for (int m=0; m<mLength; m++)
+            Bead SLa = SBeads[n];
+            if (SLa.Nnorth != null && SLa.Nsouth != null)
 			{
-                ShortLine SLa = SCurve[n];
-                ShortLine SLb = AllShortLine[m];
-                if(SLa != SLb)
-				{
-                    if(SLa.IsCrossing(SLb))
-					{
-                        // Identify SLa.bd0 with SLb.bd0
-                        Bead newNode = SLa.bd0.GetComponent<Bead>();
-                        Bead oldNode = SLb.bd0.GetComponent<Bead>();
-                        if (!newNode.isNode)
+                for (int m=0; m<mLength; m++)
+    			{
+                    Bead SLb = AllBeads[m];
+                    if (SLb.Nnorth != null && SLb.Nsouth != null)
+                    {
+                        if (Util.IsCrossing(SLa.Nnorth, SLa.Nsouth,SLb.Nnorth, SLb.Nsouth))
                         {
-
-                            newNode.Uwest = oldNode.Nnorth;
-                            if (oldNode.Nnorth.GetComponent<Bead>().Nnorth == oldNode)
-                            {
-                                newNode.Uwest.GetComponent<Bead>().Nnorth = newNode.gameObject;
-                            }
-                            else
-                            {
-                                newNode.Uwest.GetComponent<Bead>().Nsouth = newNode.gameObject;
-                            }
-                            newNode.Ueast = oldNode.Nsouth;
-                            if (oldNode.Nsouth.GetComponent<Bead>().Nnorth == oldNode)
-							{
-                                newNode.Ueast.GetComponent<Bead>().Nnorth = newNode.gameObject;
-                            } 
-                            else
-							{
-                                newNode.Ueast.GetComponent<Bead>().Nsouth = newNode.gameObject;
-                            }
-                            // omit set direction
-                            newNode.SetNode();
-                            // Inactivate SLb.bd0
-                            SLb.bd0.SetActive(false);
+                            pairs.Add(new PairBead(SLa, SLb));
+                            // Identify SLa.bd0 with SLb.bd0
+                            Debug.Log("detect crossing[" + n + "," + m + "]");
+                            //newNode.Identify(oldNode);
                         }
                     }
 				}

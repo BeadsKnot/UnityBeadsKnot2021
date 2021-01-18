@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Bead : MonoBehaviour
 {
-    public GameObject Nnorth, Nsouth, Uwest, Ueast;
-    public GameObject NnorthNode, NsouthNode, UwestNode, UeastNode;
+    public GameObject Nnorth=null, Nsouth = null, Uwest = null, Ueast = null;
+    public GameObject NnorthNode = null, NsouthNode = null, UwestNode = null, UeastNode = null;
     public bool isNode, isCrossing, isEnd;
     public Mesh BeadMesh;
     // Start is called before the first frame update
@@ -41,7 +41,7 @@ public class Bead : MonoBehaviour
  
     public void SetSouth(GameObject bead)
     {
-        Nnorth = bead;
+        Nsouth = bead;
     }
 
     public void SetNode()
