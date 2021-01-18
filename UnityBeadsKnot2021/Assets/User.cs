@@ -97,19 +97,41 @@ public class User : MonoBehaviour
         for(int n=0; n<nLength; n++)
 		{
             Bead SLa = SBeads[n];
-            if (SLa.Nnorth != null && SLa.Nsouth != null)
+            GameObject BdaN = SLa.Nnorth;
+            GameObject BdaS = SLa.Nsouth;
+            if (BdaN != null && BdaS != null)
 			{
                 for (int m=0; m<mLength; m++)
     			{
                     Bead SLb = AllBeads[m];
-                    if (SLb.Nnorth != null && SLb.Nsouth != null)
+                    GameObject BdbN = SLb.Nnorth;
+                    GameObject BdbS = SLb.Nsouth;
+                    if (BdbN != null && BdbS != null && SLa.gameObject != BdbN && SLa.gameObject != BdbS)
                     {
-                        if (Util.IsCrossing(SLa.Nnorth, SLa.Nsouth,SLb.Nnorth, SLb.Nsouth))
+                        if (Util.IsCrossing(BdaN, BdaS, BdbN, BdbS))
                         {
-                            pairs.Add(new PairBead(SLa, SLb));
-                            // Identify SLa.bd0 with SLb.bd0
-                            Debug.Log("detect crossing[" + n + "," + m + "]");
-                            //newNode.Identify(oldNode);
+                            int pairLength = pairs.Count;
+                            bool itsNew = true;
+                            for(int k=0; k<pairLength; k++)
+							{
+                                GameObject bdA = pairs[k].first.gameObject;
+                                GameObject bdB = pairs[k].second.gameObject;
+                                if (bdA== BdaN || bdA== BdaS || bdA == BdbN || bdA == BdbS)
+								{
+                                    itsNew = false;
+								}
+                                if (bdB == BdaN || bdB == BdaS || bdB == BdbN || bdB == BdbS)
+                                {
+                                    itsNew = false;
+                                }
+                            }
+                            if (itsNew)
+                            {
+                                pairs.Add(new PairBead(SLa, SLb));
+                                // Identify SLa.bd0 with SLb.bd0
+                                Debug.Log("detect crossing[" + n + "," + m + "]");
+                                //newNode.Identify(oldNode);
+                            }
                         }
                     }
 				}
