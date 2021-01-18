@@ -68,7 +68,61 @@ public class User : MonoBehaviour
             bead[pos].GetComponent<Bead>().SetNorth(bead[pos + 1]);
             bead[pos + 1].GetComponent<Bead>().SetSouth(bead[pos]);
         }
-        bead[0].GetComponent<Bead>().isNode = bead[0].GetComponent<Bead>().isEnd = true;
-        bead[size - 1].GetComponent<Bead>().isNode = bead[size - 1].GetComponent<Bead>().isEnd = true;
+        bead[0].GetComponent<Bead>().SetNode();
+        bead[0].GetComponent<Bead>().isEnd = true;
+        bead[size - 1].GetComponent<Bead>().SetNode();
+        bead[size - 1].GetComponent<Bead>().isEnd = true;
+        DetectCrossingAfterAddEdge(ShortCurve);
     }
+
+    void DetectCrossingAfterAddEdge(GameObject ShortCurve)
+	{
+        ShortLine[] SCurve = ShortCurve.GetComponentsInChildren<ShortLine>();
+        ShortLine[] AllShortLine = FindObjectsOfType<ShortLine>();
+        int nLength = SCurve.Length;
+        int mLength = AllShortLine.Length;
+        for(int n=0; n<nLength; n++)
+		{
+            for (int m=0; m<mLength; m++)
+			{
+                ShortLine SLa = SCurve[n];
+                ShortLine SLb = AllShortLine[m];
+                if(SLa != SLb)
+				{
+                    if(SLa.IsCrossing(SLb))
+					{
+                        // Identify SLa.bd0 with SLb.bd0
+                        Bead newNode = SLa.bd0.GetComponent<Bead>();
+                        Bead oldNode = SLb.bd0.GetComponent<Bead>();
+                        if (!newNode.isNode)
+                        {
+
+                            newNode.Uwest = oldNode.Nnorth;
+                            if (oldNode.Nnorth.GetComponent<Bead>().Nnorth == oldNode)
+                            {
+                                newNode.Uwest.GetComponent<Bead>().Nnorth = newNode.gameObject;
+                            }
+                            else
+                            {
+                                newNode.Uwest.GetComponent<Bead>().Nsouth = newNode.gameObject;
+                            }
+                            newNode.Ueast = oldNode.Nsouth;
+                            if (oldNode.Nsouth.GetComponent<Bead>().Nnorth == oldNode)
+							{
+                                newNode.Ueast.GetComponent<Bead>().Nnorth = newNode.gameObject;
+                            } 
+                            else
+							{
+                                newNode.Ueast.GetComponent<Bead>().Nsouth = newNode.gameObject;
+                            }
+                            // omit set direction
+                            newNode.SetNode();
+                            // Inactivate SLb.bd0
+                            SLb.bd0.SetActive(false);
+                        }
+                    }
+				}
+			}
+		}
+	}
 }
